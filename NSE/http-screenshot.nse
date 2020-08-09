@@ -33,27 +33,17 @@ local stdnse = require "stdnse"
 portrule = shortport.http
 
 action = function(host, port)
-	-- Check to see if ssl is enabled, if it is, this will be set to "ssl"
-	local ssl = port.version.service_tunnel
-
-	-- The default URLs will start with http://
-	local prefix = "http"
-
-	-- Screenshots will be called screenshot-namp-<IP>:<port>.png
-        local filename = "screenshot-nmap-" .. host.ip .. ":" .. port.number .. ".png"
 	
-	-- If SSL is set on the port, switch the prefix to https
-	if ssl == "ssl" then
-		prefix = "https"	
-	end
-
-	-- Execute the shell command wkhtmltoimage-i386 <url> <filename>
-	local cmd = "wkhtmltoimage-i386 -n " .. prefix .. "://" .. host.ip .. ":" .. port.number .. " " .. filename .. " 2> /dev/null   >/dev/null"
+	-- Screenshots will be called screenshot-namp-<IP>:<port>.png
+        local filename = "screenshot-nmap-" .. host.ip .. "-" .. host.targetname .. "-" .. port.number .. ".jpg"
+	
+	-- Execute the shell command wkhtmltoimage <url> <filename>
+	local cmd = "wkhtmltoimage -n " .. port.version.name .. "://" .. host.targetname .. ":" .. port.number .. " " .. filename .. " 2> /dev/null   >/dev/null"
 	
 	local ret = os.execute(cmd)
 
 	-- If the command was successful, print the saved message, otherwise print the fail message
-	local result = "failed (verify wkhtmltoimage-i386 is in your path)"
+	local result = "failed (verify wkhtmltoimage is in your path)"
 
 	if ret then
 		result = "Saved to " .. filename
